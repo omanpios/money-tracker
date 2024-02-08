@@ -1,0 +1,22 @@
+{
+  "name": "money-tracker",
+  "version": "1.0.0",
+  "description": "App to keep trace of your money",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omanpios/money-tracker.git"
+  },
+  "keywords": [
+    "money"
+  ],
+  "author": "omanpios",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omanpios/money-tracker/issues"
+  },
+  "homepage": "https://github.com/omanpios/money-tracker#readme"
+}
