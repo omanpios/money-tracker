@@ -14,12 +14,25 @@ app.get("/", (req, res) => {
   res.json({ data: "hola" });
 });
 
+async function verifyIfUserExists(email) {
+  const checkResult = await prisma.user.findUnique({
+    where: { email: email },
+  });
+  return checkResult;
+}
+async function createUser(email, hash) {
+  const newUser = await prisma.user.create({
+    data: {
+      email: email,
+      password: hash,
+    },
+  });
+  return newUser;
+}
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const checkResult = await prisma.user.findFirst({
-      where: { email: email },
-    });
+    const checkResult = await verifyIfUserExists(email);
     if (checkResult != null) {
       res.status(400).send("You already exist in DB");
     } else {
@@ -27,16 +40,38 @@ app.post("/register", async (req, res) => {
         if (err) {
           console.error("Error hashing password:", err);
         } else {
-          const prismaCreate = await prisma.user.create({
-            data: {
-              email: email,
-              password: hash,
-            },
+          const newUser = await createUser(email, hash);
+          res.status(201).json({
+            id: newUser.id,
+            email: newUser.email,
           });
-          console.log(prismaCreate);
-          res.status(201).json({ email: email });
         }
       });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password: loginPassword } = req.body;
+  try {
+    const user = await verifyIfUserExists(email);
+    if (user != null) {
+      const { email, password: storedPassword } = user;
+      bcrypt.compare(loginPassword, storedPassword, (error, result) => {
+        if (error) {
+          console.log(error);
+        } else {
+          if (result) {
+            res.sendStatus(200);
+          } else {
+            res.sendStatus(403);
+          }
+        }
+      });
+    } else {
+      res.sendStatus(404);
     }
   } catch (error) {
     console.log(error);
