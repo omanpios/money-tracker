@@ -8,15 +8,20 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+  id            Int           @id @default(autoincrement())
+  email         String        @unique
+  password      String
+  Categories    Category[]
+  Subcategories Subcategory[]
+  Transactions  Transaction[]
 }
 
 model Category {
   id            Int           @id @default(autoincrement())
   name          String        @unique
   subcategories Subcategory[]
+  User          User?         @relation(fields: [userId], references: [id])
+  userId        Int?
 }
 
 model Subcategory {
@@ -26,6 +31,8 @@ model Subcategory {
   monthlyProvision Float
   category         Category      @relation(fields: [categoryId], references: [id])
   transactions     Transaction[]
+  User             User?         @relation(fields: [userId], references: [id])
+  userId           Int?
 }
 
 model Transaction {
@@ -34,4 +41,6 @@ model Transaction {
   amount        Float
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   subcategoryId Int
+  User          User?        @relation(fields: [userId], references: [id])
+  userId        Int?
 }
