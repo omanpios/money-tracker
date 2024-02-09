@@ -16,12 +16,16 @@ app.get("/", (req, res) => {
 
 async function verifyIfUserExists(email) {
   const formattedEmail = email.toLowerCase();
-  const checkResult = await prisma.user.findUnique({
+  const userExists = await prisma.user.findUnique({
     where: {
       email: formattedEmail,
     },
   });
-  return checkResult;
+  if (userExists === null) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 async function createUser(email, hash) {
@@ -34,12 +38,15 @@ async function createUser(email, hash) {
   });
   return newUser;
 }
+
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const checkResult = await verifyIfUserExists(email);
-    if (checkResult != null) {
-      res.status(400).send("You already exist in DB");
+    const userExists = await verifyIfUserExists(email);
+    if (userExists) {
+      res
+        .status(400)
+        .json({ error: `email address '${email}' is already registered` });
     } else {
       bcrypt.hash(password, saltRounds, async (err, hash) => {
         if (err) {
