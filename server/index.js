@@ -14,14 +14,18 @@ app.get("/", (req, res) => {
   res.json({ data: "hola" });
 });
 
-async function verifyIfUserExists(email) {
+async function checkIfUserExists(email) {
   const formattedEmail = email.toLowerCase();
-  const checkResult = await prisma.user.findUnique({
+  const userExists = await prisma.user.findUnique({
     where: {
       email: formattedEmail,
     },
   });
-  return checkResult;
+  if (userExists === null) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 async function createUser(email, hash) {
@@ -34,12 +38,15 @@ async function createUser(email, hash) {
   });
   return newUser;
 }
+
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const checkResult = await verifyIfUserExists(email);
-    if (checkResult != null) {
-      res.status(400).send("You already exist in DB");
+    const userExists = await checkIfUserExists(email);
+    if (userExists) {
+      res
+        .status(400)
+        .json({ error: `email address '${email}' is already registered` });
     } else {
       bcrypt.hash(password, saltRounds, async (err, hash) => {
         if (err) {
@@ -58,11 +65,20 @@ app.post("/register", async (req, res) => {
   }
 });
 
+async function getUserByEmail(email) {
+  const formattedEmail = email.toLowerCase();
+  const user = await prisma.user.findFirst({
+    where: { email: formattedEmail },
+  });
+  return user;
+}
+
 app.post("/login", async (req, res) => {
   const { email, password: loginPassword } = req.body;
   try {
-    const user = await verifyIfUserExists(email);
-    if (user != null) {
+    const user = await getUserByEmail(email);
+    const userExists = await checkIfUserExists(email);
+    if (userExists) {
       const { email, password: storedPassword } = user;
       bcrypt.compare(loginPassword, storedPassword, (error, result) => {
         if (error) {
@@ -71,7 +87,7 @@ app.post("/login", async (req, res) => {
           if (result) {
             res.sendStatus(200);
           } else {
-            res.sendStatus(403);
+            res.sendStatus(401);
           }
         }
       });
@@ -94,7 +110,7 @@ async function createCategory(name, userId) {
   return newCategory;
 }
 
-async function verifyIfCategoryExists(name, userId) {
+async function checkIfCategoryExists(name, userId) {
   const formattedName = name.toLowerCase();
   const categoryExists = await prisma.category.findUnique({
     where: {
@@ -111,7 +127,7 @@ async function verifyIfCategoryExists(name, userId) {
 app.post("/category", async (req, res) => {
   const { name, userId } = req.body;
   try {
-    const categoryExists = await verifyIfCategoryExists(name, userId);
+    const categoryExists = await checkIfCategoryExists(name, userId);
     if (!categoryExists) {
       const newCategory = await createCategory(name, userId);
       res.status(201).json(newCategory);
