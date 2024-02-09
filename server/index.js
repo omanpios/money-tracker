@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const saltRounds = 10;
 const port = 8080;
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.json({ data: "hola" });
@@ -54,7 +54,7 @@ app.post("/register", async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 
@@ -66,7 +66,7 @@ app.post("/login", async (req, res) => {
       const { email, password: storedPassword } = user;
       bcrypt.compare(loginPassword, storedPassword, (error, result) => {
         if (error) {
-          console.log(error);
+          console.error(error);
         } else {
           if (result) {
             res.sendStatus(200);
@@ -79,7 +79,48 @@ app.post("/login", async (req, res) => {
       res.sendStatus(404);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  }
+});
+
+async function createCategory(name, userId) {
+  const formattedName = name.toLowerCase();
+  const newCategory = await prisma.category.create({
+    data: {
+      name: formattedName,
+      userId,
+    },
+  });
+  return newCategory;
+}
+
+async function verifyIfCategoryExists(name, userId) {
+  const formattedName = name.toLowerCase();
+  const categoryExists = await prisma.category.findUnique({
+    where: {
+      UniqueCategoryNamePerUser: { name: formattedName, userId },
+    },
+  });
+  if (categoryExists === null) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+app.post("/category", async (req, res) => {
+  const { name, userId } = req.body;
+  try {
+    const categoryExists = await verifyIfCategoryExists(name, userId);
+    if (!categoryExists) {
+      const newCategory = await createCategory(name, userId);
+      res.status(201).json(newCategory);
+    } else {
+      res.status(400).json({ error: `Category '${name}' already exists` });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error });
+    console.error(error);
   }
 });
 

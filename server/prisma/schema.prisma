@@ -18,10 +18,12 @@ model User {
 
 model Category {
   id            Int           @id @default(autoincrement())
-  name          String        @unique
+  name          String
   subcategories Subcategory[]
   User          User          @relation(fields: [userId], references: [id])
   userId        Int
+
+  @@unique([userId, name], name: "UniqueCategoryNamePerUser")
 }
 
 model Subcategory {
