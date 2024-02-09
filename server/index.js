@@ -140,6 +140,43 @@ app.post("/category", async (req, res) => {
   }
 });
 
+async function getCategories(userId = null) {
+  const parsedUserId = parseInt(userId);
+  const categories = await prisma.category.findMany({
+    where: { userId: parsedUserId },
+  });
+  return categories;
+}
+
+async function checkIfUserIdExists(userId) {
+  const parsedUserId = parseInt(userId);
+  const userExists = await prisma.user.findFirst({
+    where: {
+      id: parsedUserId,
+    },
+  });
+  if (userExists != null) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+app.get("/category", async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const userIdExists = await checkIfUserIdExists(userId);
+    if (userIdExists) {
+      const categories = await getCategories(userId);
+      res.status(200).json(categories);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
