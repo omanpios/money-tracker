@@ -15,15 +15,20 @@ app.get("/", (req, res) => {
 });
 
 async function verifyIfUserExists(email) {
+  const formattedEmail = email.toLowerCase();
   const checkResult = await prisma.user.findUnique({
-    where: { email: email },
+    where: {
+      email: formattedEmail,
+    },
   });
   return checkResult;
 }
+
 async function createUser(email, hash) {
+  const formattedEmail = email.toLowerCase();
   const newUser = await prisma.user.create({
     data: {
-      email: email,
+      email: formattedEmail,
       password: hash,
     },
   });
