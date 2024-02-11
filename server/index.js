@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import cors from "cors";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -9,6 +10,7 @@ const saltRounds = 10;
 const port = 8080;
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.json({ data: "hola" });
