@@ -10,7 +10,6 @@ function LoginForm({ text }) {
 
   function handleInputChange(e) {
     const { value, name } = e.target;
-    console.log(name);
     setEmailPassword((prevValue) => {
       if (name === "email") {
         return {
@@ -39,7 +38,6 @@ function LoginForm({ text }) {
 
   async function handleClick(e) {
     e.preventDefault();
-    console.log();
     const { email, password } = emailPassword;
     try {
       const response = await postData("http://localhost:8080/login", {
