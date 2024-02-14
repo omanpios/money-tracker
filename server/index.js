@@ -3,6 +3,17 @@ import bodyParser from "body-parser";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import cors from "cors";
+import {
+  checkIfUserEmailExists,
+  checkIfUserIdExists,
+  createUser,
+  getUserByEmail,
+} from "./modules/user.mjs";
+import {
+  createCategory,
+  checkIfCategoryExists,
+  getCategoriesByUserId,
+} from "./modules/category.mjs";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -16,35 +27,10 @@ app.get("/", (req, res) => {
   res.json({ data: "hola" });
 });
 
-async function checkIfUserExists(email) {
-  const formattedEmail = email.toLowerCase();
-  const userExists = await prisma.user.findUnique({
-    where: {
-      email: formattedEmail,
-    },
-  });
-  if (userExists === null) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-async function createUser(email, hash) {
-  const formattedEmail = email.toLowerCase();
-  const newUser = await prisma.user.create({
-    data: {
-      email: formattedEmail,
-      password: hash,
-    },
-  });
-  return newUser;
-}
-
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const userExists = await checkIfUserExists(email);
+    const userExists = await checkIfUserEmailExists(email);
     if (userExists) {
       res
         .status(400)
@@ -67,19 +53,11 @@ app.post("/register", async (req, res) => {
   }
 });
 
-async function getUserByEmail(email) {
-  const formattedEmail = email.toLowerCase();
-  const user = await prisma.user.findFirst({
-    where: { email: formattedEmail },
-  });
-  return user;
-}
-
 app.post("/login", async (req, res) => {
   const { email, password: loginPassword } = req.body;
   try {
     const user = await getUserByEmail(email);
-    const userExists = await checkIfUserExists(email);
+    const userExists = await checkIfUserEmailExists(email);
     if (userExists) {
       const { email, password: storedPassword } = user;
       bcrypt.compare(loginPassword, storedPassword, (error, result) => {
@@ -101,31 +79,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-async function createCategory(name, userId) {
-  const formattedName = name.toLowerCase();
-  const newCategory = await prisma.category.create({
-    data: {
-      name: formattedName,
-      userId,
-    },
-  });
-  return newCategory;
-}
-
-async function checkIfCategoryExists(name, userId) {
-  const formattedName = name.toLowerCase();
-  const categoryExists = await prisma.category.findUnique({
-    where: {
-      UniqueCategoryNamePerUser: { name: formattedName, userId },
-    },
-  });
-  if (categoryExists === null) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
 app.post("/category", async (req, res) => {
   const { name, userId } = req.body;
   try {
@@ -142,34 +95,12 @@ app.post("/category", async (req, res) => {
   }
 });
 
-async function getCategories(userId = null) {
-  const parsedUserId = parseInt(userId);
-  const categories = await prisma.category.findMany({
-    where: { userId: parsedUserId },
-  });
-  return categories;
-}
-
-async function checkIfUserIdExists(userId) {
-  const parsedUserId = parseInt(userId);
-  const userExists = await prisma.user.findFirst({
-    where: {
-      id: parsedUserId,
-    },
-  });
-  if (userExists != null) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 app.get("/category", async (req, res) => {
   const { userId } = req.query;
   try {
     const userIdExists = await checkIfUserIdExists(userId);
     if (userIdExists) {
-      const categories = await getCategories(userId);
+      const categories = await getCategoriesByUserId(userId);
       res.status(200).json(categories);
     } else {
       res.sendStatus(404);
