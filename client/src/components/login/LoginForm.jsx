@@ -11,17 +11,10 @@ function LoginForm({ text }) {
   function handleInputChange(e) {
     const { value, name } = e.target;
     setEmailPassword((prevValue) => {
-      if (name === "email") {
-        return {
-          email: value,
-          password: prevValue.password,
-        };
-      } else if (name === "password") {
-        return {
-          email: prevValue.email,
-          password: value,
-        };
-      }
+      return {
+        ...prevValue,
+        [name]: value,
+      };
     });
   }
 
