@@ -14,6 +14,7 @@ import {
   checkIfCategoryExists,
   getCategoriesByUserId,
 } from "./modules/category.mjs";
+import { createSubcategory } from "./modules/subcategory.mjs";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -107,6 +108,22 @@ app.get("/category", async (req, res) => {
     }
   } catch (error) {
     console.error(error.message);
+  }
+});
+
+app.post("/subcategory", async (req, res) => {
+  const { name, categoryId, monthlyProvision, userId } = req.body;
+  try {
+    const newSubcategory = await createSubcategory(
+      name,
+      categoryId,
+      monthlyProvision,
+      userId
+    );
+    res.status(201).json(newSubcategory);
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ error: `Invalid values submitted`, message: error });
   }
 });
 
