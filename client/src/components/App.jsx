@@ -1,10 +1,7 @@
-import LoginForm from "./login/LoginForm";
-
 function App() {
   return (
     <div className="App">
-      <header className="App-header"></header>
-      <LoginForm text="Log in" />
+      <header className="App-header">Home Page</header>
     </div>
   );
 }
