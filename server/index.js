@@ -13,6 +13,7 @@ import {
   createCategory,
   checkIfCategoryExists,
   getCategoriesByUserId,
+  sumMonthlyProvision,
 } from "./modules/category.mjs";
 import { createSubcategory } from "./modules/subcategory.mjs";
 
@@ -96,8 +97,8 @@ app.post("/category", async (req, res) => {
   }
 });
 
-app.get("/category", async (req, res) => {
-  const { userId } = req.query;
+app.get("/:userId/category", async (req, res) => {
+  const { userId } = req.params;
   try {
     const userIdExists = await checkIfUserIdExists(userId);
     if (userIdExists) {
@@ -125,6 +126,12 @@ app.post("/subcategory", async (req, res) => {
     console.error(error.message);
     res.status(400).json({ error: `Invalid values submitted`, message: error });
   }
+});
+
+app.get("/category/:categoryId/provision", async (req, res) => {
+  const { categoryId } = req.params;
+  const response = await sumMonthlyProvision(parseInt(categoryId));
+  res.send(response);
 });
 
 app.listen(port, () => {

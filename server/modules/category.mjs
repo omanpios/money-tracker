@@ -35,4 +35,17 @@ async function getCategoriesByUserId(userId = null) {
   return categories;
 }
 
-export { createCategory, checkIfCategoryExists, getCategoriesByUserId };
+async function sumMonthlyProvision(categoryId) {
+  const response = await prisma.subcategory.aggregate({
+    _sum: { monthlyProvision: true },
+    where: { categoryId: categoryId },
+  });
+  return response._sum;
+}
+
+export {
+  createCategory,
+  checkIfCategoryExists,
+  getCategoriesByUserId,
+  sumMonthlyProvision,
+};
