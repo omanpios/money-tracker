@@ -1,9 +1,20 @@
-import React, { useState } from "react";
-import Box from "@mui/system/Box";
-import Stack from "@mui/system/Stack";
-import { styled } from "@mui/system";
+import React, { useEffect, useState } from "react";
+import CategoryCard from "../components/categories/CategoryCard";
 
 function CategoriesPage() {
+  useEffect(() => {
+    async function getUserCategories(userId) {
+      userId = 1;
+      const response = await getData(
+        `http://localhost:8080/${userId}/category`
+      );
+      const category = await response.json();
+      setCategoryList(category);
+    }
+
+    getUserCategories();
+  });
+
   const [categoryList, setCategoryList] = useState([]);
   async function getData(url = "") {
     const response = await fetch(url, {
@@ -15,35 +26,15 @@ function CategoriesPage() {
     return response;
   }
 
-  async function handleClick() {
-    const response = await getData("http://localhost:8080/category/1");
-    const category = await response.json();
-    setCategoryList(category);
-    console.log(categoryList);
-  }
-
-  const Item = styled("div")(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? "#262B32" : "#fff",
-    padding: theme.spacing(1),
-    textAlign: "center",
-    borderRadius: 4,
-  }));
-
   function showCategories(category) {
     return (
-      <Box sx={{ width: "100%" }}>
-        <Stack spacing={2}>
-          <Item>Category: {category.name}</Item>
-          <Item>Category Id: {category.id}</Item>
-          <Item>User Id: {category.userId}</Item>
-        </Stack>
-      </Box>
+      <CategoryCard category={category} key={category.id} id={category.id} />
     );
   }
 
   return (
     <div>
-      <button onClick={handleClick}>CategoriesPage</button>
+      <h1>Categories</h1>
       {categoryList.map(showCategories)}
     </div>
   );
