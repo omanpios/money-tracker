@@ -15,7 +15,10 @@ import {
   getCategoriesByUserId,
   sumMonthlyProvision,
 } from "./modules/category.mjs";
-import { createSubcategory } from "./modules/subcategory.mjs";
+import {
+  createSubcategory,
+  getSubcategoriesByCategoryId,
+} from "./modules/subcategory.mjs";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -132,6 +135,17 @@ app.get("/category/:categoryId/provision", async (req, res) => {
   const { categoryId } = req.params;
   const response = await sumMonthlyProvision(parseInt(categoryId));
   res.send(response);
+});
+
+app.get("/category/:categoryId/subcategory", async (req, res) => {
+  const { categoryId } = req.params;
+  try {
+    const response = await getSubcategoriesByCategoryId(parseInt(categoryId));
+    res.json(response);
+  } catch (error) {
+    res.sendStatus(500);
+    console.error(error.message);
+  }
 });
 
 app.listen(port, () => {
