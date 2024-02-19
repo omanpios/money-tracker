@@ -8,4 +8,11 @@ async function createSubcategory(name, categoryId, monthlyProvision, userId) {
   return newSubcategory;
 }
 
-export { createSubcategory };
+async function getSubcategoriesByCategoryId(categoryId) {
+  const subcategories = await prisma.subcategory.findMany({
+    where: { categoryId: categoryId },
+  });
+  return subcategories;
+}
+
+export { createSubcategory, getSubcategoriesByCategoryId };

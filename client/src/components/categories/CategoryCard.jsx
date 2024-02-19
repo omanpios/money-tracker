@@ -34,12 +34,7 @@ function CategoryCard({ category }) {
         <Typography gutterBottom variant="h5" component="div">
           {category.name}
         </Typography>
-        <Typography
-          gutterBottom
-          variant="body2"
-          color="text.secondary"
-          //  onLoad={getProvision}
-        >
+        <Typography gutterBottom variant="body2" color="text.secondary">
           Monthly provision: {provision}
         </Typography>
       </CardContent>

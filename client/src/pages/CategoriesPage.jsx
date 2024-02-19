@@ -1,30 +1,21 @@
 import React, { useEffect, useState } from "react";
 import CategoryCard from "../components/categories/CategoryCard";
+import { request } from "../components/utils/api";
 
 function CategoriesPage() {
+  const [categoryList, setCategoryList] = useState([]);
   useEffect(() => {
     async function getUserCategories(userId) {
       userId = 1;
-      const response = await getData(
-        `http://localhost:8080/user/${userId}/category`
+      const response = await request(
+        `http://localhost:8080/user/${userId}/category`,
+        "GET"
       );
-      const category = await response.json();
-      setCategoryList(category);
+      const categories = await response.json();
+      setCategoryList(categories);
     }
-
     getUserCategories();
   });
-
-  const [categoryList, setCategoryList] = useState([]);
-  async function getData(url = "") {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return response;
-  }
 
   function showCategories(category) {
     return (

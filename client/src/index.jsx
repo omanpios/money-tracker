@@ -6,6 +6,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import "bootstrap/dist/css/bootstrap.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import SubcategoriesPage from "./pages/SubcategoriesPage";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/categories",
     element: <CategoriesPage />,
+  },
+  {
+    path: "/subcategories",
+    element: <SubcategoriesPage />,
   },
 ]);
 const root = ReactDOM.createRoot(document.getElementById("root"));
