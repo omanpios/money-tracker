@@ -97,7 +97,7 @@ app.post("/category", async (req, res) => {
   }
 });
 
-app.get("/:userId/category", async (req, res) => {
+app.get("/user/:userId/category", async (req, res) => {
   const { userId } = req.params;
   try {
     const userIdExists = await checkIfUserIdExists(userId);
