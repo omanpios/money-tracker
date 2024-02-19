@@ -6,7 +6,7 @@ function CategoriesPage() {
     async function getUserCategories(userId) {
       userId = 1;
       const response = await getData(
-        `http://localhost:8080/${userId}/category`
+        `http://localhost:8080/user/${userId}/category`
       );
       const category = await response.json();
       setCategoryList(category);
