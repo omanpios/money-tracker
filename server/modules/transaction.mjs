@@ -35,8 +35,18 @@ async function getTransactionsBySubcategoryId(subcategoryId) {
   return transactions;
 }
 
+async function deleteTransaction(transactionId) {
+  const deleted = await prisma.transaction.delete({
+    where: {
+      id: transactionId,
+    },
+  });
+  return deleted;
+}
+
 export {
   createTransaction,
   getTransactionsByUserId,
   getTransactionsBySubcategoryId,
+  deleteTransaction,
 };
