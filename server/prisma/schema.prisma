@@ -47,4 +47,5 @@ model Transaction {
   subcategoryId Int
   User          User         @relation(fields: [userId], references: [id])
   userId        Int
+  date          DateTime
 }
