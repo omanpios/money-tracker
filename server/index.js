@@ -19,6 +19,12 @@ import {
   createSubcategory,
   getSubcategoriesByCategoryId,
 } from "./modules/subcategory.mjs";
+import {
+  createTransaction,
+  getTransactionsByUserId,
+  getTransactionsBySubcategoryId,
+  deleteTransaction,
+} from "./modules/transaction.mjs";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -145,6 +151,68 @@ app.get("/category/:categoryId/subcategory", async (req, res) => {
   } catch (error) {
     res.sendStatus(500);
     console.error(error.message);
+  }
+});
+
+app.post("/transaction", async (req, res) => {
+  const data = req.body;
+  try {
+    const transaction = await createTransaction(data);
+    res.status(201).json(transaction);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/user/:userId/transaction", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const transactions = await getTransactionsByUserId(parseInt(userId));
+    const totalAmount = transactions.reduce((acc, obj) => {
+      return acc + obj.amount;
+    }, 0);
+    const totalAmountFormatted = parseFloat(totalAmount.toFixed(2));
+    res.json({
+      totalAmount: totalAmountFormatted,
+      count: transactions.length,
+      data: transactions,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/subcategory/:subcategoryId/transaction", async (req, res) => {
+  const { subcategoryId } = req.params;
+  try {
+    const transactions = await getTransactionsBySubcategoryId(
+      parseInt(subcategoryId)
+    );
+    const totalAmount = transactions.reduce((acc, obj) => {
+      return acc + obj.amount;
+    }, 0);
+    const totalAmountFormatted = parseFloat(totalAmount.toFixed(2));
+    res.json({
+      totalAmount: totalAmountFormatted,
+      count: transactions.length,
+      data: transactions,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete("/transaction/:transactionId", async (req, res) => {
+  const { transactionId } = req.params;
+  try {
+    await deleteTransaction(parseInt(transactionId));
+    res.json({ message: "Transaction deleted." });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
   }
 });
 
