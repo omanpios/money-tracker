@@ -7,6 +7,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import "bootstrap/dist/css/bootstrap.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SubcategoriesPage from "./pages/SubcategoriesPage";
+import TransactionsPage from "./pages/TransactionsPage";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/subcategories",
     element: <SubcategoriesPage />,
+  },
+  {
+    path: "/transactions",
+    element: <TransactionsPage />,
   },
 ]);
 const root = ReactDOM.createRoot(document.getElementById("root"));
