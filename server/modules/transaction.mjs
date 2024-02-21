@@ -24,6 +24,8 @@ async function createTransaction({
 async function getTransactionsByUserId(userId) {
   const transactions = await prisma.transaction.findMany({
     where: { userId: userId },
+    include: { subcategory: { select: { name: true } } },
+    orderBy: { date: "desc" },
   });
   return transactions;
 }
@@ -31,6 +33,8 @@ async function getTransactionsByUserId(userId) {
 async function getTransactionsBySubcategoryId(subcategoryId) {
   const transactions = await prisma.transaction.findMany({
     where: { subcategoryId: subcategoryId },
+    include: { subcategory: { select: { name: true } } },
+    orderBy: { date: "desc" },
   });
   return transactions;
 }
