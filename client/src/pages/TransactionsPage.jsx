@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Header from "../components/table/Header";
 import Body from "../components/table/Body";
-import { request } from "../components/utils/api";
+import { request } from "../components/utils/utils";
 
 function TransactionsPage() {
-  const headers = ["Description", "Amount", "Date", "SubcategoryId"];
+  const headers = ["Description", "Amount", "Date", "Subcategory name"];
   const [transactions, setTransactions] = useState({
     totalAmount: null,
     count: null,
@@ -27,7 +26,7 @@ function TransactionsPage() {
     ],
   });
 
-  const userId = 5;
+  const userId = 1;
   useEffect(() => {
     async function getSubcategories() {
       const response = await request(
