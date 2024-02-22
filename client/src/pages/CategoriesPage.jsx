@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import CategoryCard from "../components/categories/CategoryCard";
-import { request } from "../components/utils/api";
+import { request } from "../components/utils/utils";
 
 function CategoriesPage() {
   const [categoryList, setCategoryList] = useState([]);
   useEffect(() => {
     async function getUserCategories(userId) {
       userId = 1;
+
       const response = await request(
         `http://localhost:8080/user/${userId}/category`,
         "GET"

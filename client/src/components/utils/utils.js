@@ -8,4 +8,9 @@ async function request(url = "", method = "GET") {
   return response;
 }
 
-export { request };
+let currency = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
+export { request, currency };

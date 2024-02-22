@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import SubcategoryCard from "../components/subcategories/SubcategoryCard";
-import { request } from "../components/utils/api";
+import { request } from "../components/utils/utils";
 
 function SubcategoriesPage() {
-  const categoryId = 1;
+  const categoryId = 5;
   const [subcategoriesList, setSubcategoriesList] = useState([]);
 
   useEffect(() => {
@@ -12,6 +12,7 @@ function SubcategoriesPage() {
         `http://localhost:8080/category/${categoryId}/subcategory`
       );
       const subcategories = await response.json();
+
       setSubcategoriesList(subcategories);
     }
     getSubcategories();
@@ -30,7 +31,7 @@ function SubcategoriesPage() {
     <div>
       <h1>Test</h1>
       {subcategoriesList.map(showSubcategories)}
-      <p>Total: {total}</p>
+      <p>Total provision: {total}</p>
     </div>
   );
 }
