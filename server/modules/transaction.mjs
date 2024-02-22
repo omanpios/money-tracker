@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { getSubcategoriesByUserId } from "./subcategory.mjs";
 
 const prisma = new PrismaClient();
 
@@ -48,9 +49,38 @@ async function deleteTransaction(transactionId) {
   return deleted;
 }
 
+async function splitIncome(userId, incomeAmount, description, date) {
+  try {
+    const response = await getSubcategoriesByUserId(userId);
+    const subcategories = response;
+    const totalProvision = subcategories.reduce((acc, subc) => {
+      return acc + subc.monthlyProvision;
+    }, 0);
+    subcategories.forEach((subcategory) => {
+      const proportion = subcategory.monthlyProvision / totalProvision;
+      const amount = proportion * incomeAmount;
+      try {
+        createTransaction({
+          description: description,
+          amount: parseFloat(amount.toFixed(2)),
+          subcategoryId: subcategory.id,
+          userId: userId,
+          date: date,
+        });
+      } catch (error) {
+        return error;
+      }
+    });
+  } catch (error) {
+    return error;
+  }
+  return true;
+}
+
 export {
   createTransaction,
   getTransactionsByUserId,
   getTransactionsBySubcategoryId,
   deleteTransaction,
+  splitIncome,
 };

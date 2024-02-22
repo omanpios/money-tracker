@@ -49,9 +49,21 @@ async function checkIfUserIdExists(userId) {
   }
 }
 
+async function validateUserAndSubcategory(userId, subcategoryId) {
+  const response = await prisma.subcategory.findFirst({
+    where: {
+      userId,
+      id: subcategoryId,
+    },
+  });
+  console.log(response);
+  return response;
+}
+
 export {
   checkIfUserEmailExists,
   createUser,
   getUserByEmail,
   checkIfUserIdExists,
+  validateUserAndSubcategory,
 };

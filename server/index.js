@@ -8,6 +8,7 @@ import {
   checkIfUserIdExists,
   createUser,
   getUserByEmail,
+  validateUserAndSubcategory,
 } from "./modules/user.mjs";
 import {
   createCategory,
@@ -18,12 +19,14 @@ import {
 import {
   createSubcategory,
   getSubcategoriesByCategoryId,
+  getSubcategoriesByUserId,
 } from "./modules/subcategory.mjs";
 import {
   createTransaction,
   getTransactionsByUserId,
   getTransactionsBySubcategoryId,
   deleteTransaction,
+  splitIncome,
 } from "./modules/transaction.mjs";
 
 const app = express();
@@ -121,6 +124,27 @@ app.get("/user/:userId/category", async (req, res) => {
   }
 });
 
+app.get("/user/:userId/subcategory", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userIdExists = await checkIfUserIdExists(userId);
+    if (userIdExists) {
+      const subcategories = await getSubcategoriesByUserId(parseInt(userId));
+      const totalProvision = subcategories.reduce((acc, subcategory) => {
+        return acc + subcategory.monthlyProvision;
+      }, 0);
+      for (const subcat of subcategories) {
+        subcat.proportion = subcat.monthlyProvision / totalProvision;
+      }
+      res.status(200).json({ totalProvision, subcategories });
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
 app.post("/subcategory", async (req, res) => {
   const { name, categoryId, monthlyProvision, userId } = req.body;
   try {
@@ -156,12 +180,20 @@ app.get("/category/:categoryId/subcategory", async (req, res) => {
 
 app.post("/transaction", async (req, res) => {
   const data = req.body;
-  try {
-    const transaction = await createTransaction(data);
-    res.status(201).json(transaction);
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ error: error.message });
+  const result = await validateUserAndSubcategory(
+    data.userId,
+    data.subcategoryId
+  );
+  if (result == null) {
+    res.status(409).json({ error: "Subcategory does not belong to user" });
+  } else {
+    try {
+      const transaction = await createTransaction(data);
+      res.status(201).json(transaction);
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({ error: error.message });
+    }
   }
 });
 
@@ -213,6 +245,22 @@ app.delete("/transaction/:transactionId", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: error.message });
+  }
+});
+
+app.post("/income", async (req, res) => {
+  const { userId, amount, description, date } = req.body;
+  const user = parseInt(userId);
+  try {
+    const response = await splitIncome(user, amount, description, date);
+    if (response) {
+      res.json(response);
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (error) {
+    res.status(400).json(error);
+    return;
   }
 });
 
