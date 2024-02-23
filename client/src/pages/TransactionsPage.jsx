@@ -7,7 +7,7 @@ import Body from "../components/table/Body";
 import { request } from "../components/utils/utils";
 
 function TransactionsPage() {
-  const headers = ["Description", "Amount", "Date", "Subcategory name"];
+  const headers = ["Date", "Description", "Amount", "Subcategory name"];
   const [transactions, setTransactions] = useState({
     totalAmount: null,
     count: null,
