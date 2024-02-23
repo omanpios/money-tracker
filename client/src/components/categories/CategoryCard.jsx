@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
+import { currency } from "../utils/utils";
 
 function CategoryCard({ category }) {
   const categoryId = category.id;
@@ -35,7 +36,7 @@ function CategoryCard({ category }) {
           {category.name}
         </Typography>
         <Typography gutterBottom variant="body2" color="text.secondary">
-          Monthly provision: {provision}
+          Monthly provision: {currency.format(provision)}
         </Typography>
       </CardContent>
     </Card>
