@@ -15,11 +15,11 @@ function Body({ transactions }) {
     let date = new Date(transaction.date);
     return (
       <TableRow>
+        <TableCell>{date.toLocaleDateString("en-US", options)}</TableCell>
         <TableCell>{transaction.description}</TableCell>
         <TableCell align="right">
           {currency.format(transaction.amount)}
         </TableCell>
-        <TableCell>{date.toLocaleDateString("en-US", options)}</TableCell>
         <TableCell>{transaction.subcategory.name}</TableCell>
       </TableRow>
     );
