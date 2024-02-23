@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SubcategoryCard from "../components/subcategories/SubcategoryCard";
-import { request } from "../components/utils/utils";
+import { request, currency } from "../components/utils/utils";
 
 function SubcategoriesPage() {
   const categoryId = 5;
@@ -31,7 +31,7 @@ function SubcategoriesPage() {
     <div>
       <h1>Test</h1>
       {subcategoriesList.map(showSubcategories)}
-      <p>Total provision: {total}</p>
+      <p>Total provision: {currency.format(total)}</p>
     </div>
   );
 }
